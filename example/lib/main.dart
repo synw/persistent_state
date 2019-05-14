@@ -25,8 +25,6 @@ class MyApp extends StatelessWidget {
 }
 
 void main() {
-  initDb().then((_) {
-    state.init();
-  });
+  initDb().then((_) => state.init());
   runApp(MyApp());
 }

@@ -62,6 +62,7 @@ In `state.dart`:
       Future<dynamic> get onReady => _readyCompleter.future;
 
       Future<void> navigate(BuildContext context, String routeName) async {
+         // Hit the database to update the route
          store.mutate("route", routeName);
          await Navigator.of(context).pushNamed(routeName);
       }
@@ -72,11 +73,11 @@ In `state.dart`:
          assert(db.isReady);
          try {
             store = PersistentState(db: db);
-            await store.init();
+            store.init();
             await store.onReady;
             _readyCompleter.complete();
          } catch (e) {
-            throw ("Can not create persistent state");
+            throw ("Can not create persistent state $e");
          }
       }
    }

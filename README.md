@@ -89,13 +89,13 @@ In `state.dart`:
       initDb().then((_) {
          state.init();
       });
-   runApp(MyApp());
+      runApp(MyApp());
    }
 
    // later
    await state.onReady;
    // or
-   state.onReady.then((_) => doSomething())
+   state.onReady.then((_) => doSomething());
    ```
 
 

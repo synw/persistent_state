@@ -86,9 +86,7 @@ In `state.dart`:
 
    ```dart
    void main() {
-      initDb().then((_) {
-         state.init();
-      });
+      initDb().then((_) => state.init());
       runApp(MyApp());
    }
 

@@ -16,7 +16,11 @@ Goal: to persist the current page
    Db db = Db();
 
    DbTable stateTableSchema() {
-     // define a state table in the database
+     /// Define a state table in the database
+     ///
+     /// Documentation about schemas:
+     /// https://pub.dev/documentation/sqlcool/latest/sqlcool/DbTable-class.html
+     ///
      return DbTable("state")..varchar("route", defaultValue: '"/page1"');
    }
 
@@ -77,6 +81,23 @@ In `state.dart`:
       }
    }
    ```
+
+### Init state
+
+   ```dart
+   void main() {
+      initDb().then((_) {
+         state.init();
+      });
+   runApp(MyApp());
+   }
+
+   // later
+   await state.onReady;
+   // or
+   state.onReady.then((_) => doSomething())
+   ```
+
 
 ### Use the state
 

@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
-import 'page_builder.dart';
-import 'state.dart';
 import 'db.dart';
-import 'intro.dart';
+import 'menu.dart';
+import 'routes/page_builder.dart';
+import 'routes/intro.dart';
+import 'squares/squares.dart';
 
 final routes = {
+  '/': (BuildContext context) => MenuPage(),
+  // pages example
+  '/intro': (BuildContext context) => IntroPage(),
   '/page1': (BuildContext context) => Page(1),
   '/page2': (BuildContext context) => Page(2),
   '/page3': (BuildContext context) => Page(3),
   '/page4': (BuildContext context) => Page(4),
   '/page5': (BuildContext context) => Page(5),
+  // squares example
+  '/squares': (BuildContext context) => SquaresPage(),
 };
 
 class MyApp extends StatelessWidget {
@@ -18,13 +24,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Persistent state demo',
-      home: IntroPage(),
       routes: routes,
     );
   }
 }
 
 void main() {
-  initDb().then((_) => state.init());
+  initDb();
   runApp(MyApp());
 }

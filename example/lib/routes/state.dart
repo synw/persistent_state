@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:persistent_state/persistent_state.dart';
-import 'db.dart';
+import '../db.dart';
 
-AppState state = AppState();
+var state = RouteState();
 
-class AppState {
-  AppState() {}
-
+class RouteState {
   PersistentState store;
   Completer _readyCompleter = Completer();
 
@@ -24,14 +22,23 @@ class AppState {
 
   Future<void> init() async {
     assert(db.isReady);
-    print("Initializing state");
-    try {
-      store = PersistentState(db: db, verbose: true);
-      await store.init();
-      await store.onReady;
-      _readyCompleter.complete();
-    } catch (e) {
-      throw ("Can not create persistent state");
+    if (_readyCompleter.isCompleted) return;
+    print("Initializing routes state");
+    //try {
+    store = PersistentState(db: db, table: "routes_state", verbose: true);
+    await store.init();
+    await store.onReady;
+    _readyCompleter.complete();
+    /* } catch (e) {
+      throw ("Can not create persistent state $e");
+    }*/
+  }
+
+  void disposeIfNeeded() {
+    if (store != null) {
+      store.dispose();
+      _readyCompleter = Completer();
+      print("Disposed route state");
     }
   }
 }

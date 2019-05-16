@@ -9,10 +9,15 @@ Persist state in an Sqlite database across restarts and returns from hibernation
 **PersistentState**: constructor parameters:
 
 - **db**: an Sqlcool database
-- **table**: the table to be used for the state
+- **table**: the table to be used for the state. Defailt "state".
+- **id**: id of the table row to use. Default 1.
 - **verbose**: verbosity level
 
-## Methods
+### Methods
+
+**init**: initialize the state. Run before using it.
+
+**onReady**: a future that will complete when the state is initialized
 
 **mutate**: change the value of a key in the persistent state
 
@@ -26,6 +31,10 @@ This method is asynchronous but can not be awaited. The database queries are que
 - **key**: the key to get
 
 This method does not hit the database.
+
+**dispose**: dispose the state once finished using to clean up memory
+
+**describe**: prints a description of the state
 
 ## Example
 

@@ -6,7 +6,7 @@ var state = SquaresState();
 
 class SquaresState {
   PersistentState store;
-  Completer _readyCompleter = Completer();
+  Completer _readyCompleter = Completer<dynamic>();
 
   Future<dynamic> get onReady => _readyCompleter.future;
 
@@ -30,7 +30,7 @@ class SquaresState {
   void disposeIfNeeded() {
     if (store != null) {
       store.dispose();
-      _readyCompleter = Completer();
+      _readyCompleter = Completer<dynamic>();
       print("Disposed route state");
     }
   }

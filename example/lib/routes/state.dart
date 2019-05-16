@@ -7,7 +7,7 @@ var state = RouteState();
 
 class RouteState {
   PersistentState store;
-  Completer _readyCompleter = Completer();
+  Completer _readyCompleter = Completer<dynamic>();
 
   String get currentRoute => store.select("route");
   //set currentRoute(String routeName) => store.mutate("route", routeName);
@@ -37,7 +37,7 @@ class RouteState {
   void disposeIfNeeded() {
     if (store != null) {
       store.dispose();
-      _readyCompleter = Completer();
+      _readyCompleter = Completer<dynamic>();
       print("Disposed route state");
     }
   }

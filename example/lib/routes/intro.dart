@@ -6,7 +6,7 @@ class _IntroPageState extends State<IntroPage> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-      state.onReady.then((_) {
+      state.onReady.then((dynamic _) {
         // go to the previously persisted page
         Navigator.of(context).pushReplacementNamed(state.currentRoute);
         print("Redirecting to ${state.currentRoute}");
@@ -22,9 +22,9 @@ class _IntroPageState extends State<IntroPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           const CircularProgressIndicator(),
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: const Text("Loading .."),
+          const Padding(
+            padding: EdgeInsets.all(15.0),
+            child: Text("Loading .."),
           )
         ],
       ),

@@ -9,8 +9,8 @@ class _SquaresPageState extends State<SquaresPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () {
-      state.onReady.then((_) => setState(() => ready = true));
+    Future<dynamic>.delayed(Duration.zero, () {
+      state.onReady.then((dynamic _) => setState(() => ready = true));
     });
   }
 
@@ -20,7 +20,7 @@ class _SquaresPageState extends State<SquaresPage> {
     // draw
     while (state.active != maxSquares) {
       if (!running) return;
-      await Future.delayed(Duration(milliseconds: 50));
+      await Future<dynamic>.delayed(Duration(milliseconds: 50));
       // hit the database
       setState(() => state.active++);
     }

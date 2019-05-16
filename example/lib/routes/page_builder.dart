@@ -26,7 +26,7 @@ class _PageState extends State<Page> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text("Page ${widget.pageNum}", textScaleFactor: 2.0),
-                Padding(padding: const EdgeInsets.all(15.0)),
+                const Padding(padding: EdgeInsets.all(15.0)),
                 RaisedButton(
                   child: const Text("Back to the menu"),
                   onPressed: () => Navigator.of(context).pushNamed("/"),

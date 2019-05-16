@@ -3,7 +3,10 @@ import 'package:flutter/foundation.dart';
 //import 'package:observable/observable.dart';
 import 'package:sqlcool/sqlcool.dart';
 
+/// A class to persist some state to a database
 class PersistentState {
+  /// Default constructor: provide at least a [Db] an make sure
+  /// that your database has a schema for the state table
   PersistentState(
       {@required this.db,
       this.table = "state",
@@ -20,20 +23,33 @@ class PersistentState {
     }
   }
 
+  /// This Sqlcool [Db]
   final Db db;
+
+  /// Verbosity level
   bool verbose;
+
+  /// The database table to use for this instance of state
   final String table;
+
+  /// The row id to use for this instance of state
   final int id;
 
   SynchronizedMap _synchronizedMap;
-  final Completer _readyCompleter = Completer();
+  final Completer _readyCompleter = Completer<dynamic>();
   bool _isReady = false;
 
   //ObservableMap<String, String> get data => _synchronizedMap.data;
 
+  /// A future that completes when the state is ready
   Future<dynamic> get onReady => _readyCompleter.future;
+
+  /// Check if the state is ready
   bool get isReady => _isReady;
 
+  /// Select a key to get it's value.
+  ///
+  /// This does not hit the database
   String select(String key) {
     assert(_isReady);
     String res;
@@ -49,6 +65,12 @@ class PersistentState {
     return res;
   }
 
+  /// Change the value of a key
+  ///
+  /// This hits the database with an update query.
+  /// Limitation: rhis method is async but can not be awaited.
+  /// The queries are queued so this method can
+  /// be safely called concurrently
   void mutate(String key, String value) {
     assert(_isReady);
     try {
@@ -61,9 +83,11 @@ class PersistentState {
     }
   }
 
+  /// Initialize the state
+  ///
+  /// Make sure that the [Db] is ready before running this.
   Future<void> init() async {
     assert(db.isReady);
-    assert(db.hasSchema);
     try {
       String columns;
       for (DatabaseColumn col in db.schema.table(table).schema) {
@@ -89,10 +113,12 @@ class PersistentState {
     _readyCompleter.complete();
   }
 
+  /// Dispose the state to free up memory
   void dispose() {
     _synchronizedMap.dispose();
   }
 
+  /// Print a description of the current state
   void describe() {
     debugPrint("PERSISTANT STATE:");
     _synchronizedMap.data.forEach((k, v) {

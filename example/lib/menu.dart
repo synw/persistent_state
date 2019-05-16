@@ -25,7 +25,7 @@ class _MenuPageState extends State<MenuPage> {
                 Navigator.of(context).pushNamed("/intro");
               },
             ),
-            Padding(padding: const EdgeInsets.only(bottom: 15.0)),
+            const Padding(padding: EdgeInsets.only(bottom: 15.0)),
             RaisedButton(
               child: const Text("Squares"),
               onPressed: () {

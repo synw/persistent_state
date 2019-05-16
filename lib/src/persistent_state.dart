@@ -4,13 +4,14 @@ import 'package:flutter/foundation.dart';
 import 'package:sqlcool/sqlcool.dart';
 
 class PersistentState {
-  PersistentState({@required this.db, this.verbose = false})
+  PersistentState(
+      {@required this.db, this.table = "state", this.verbose = false})
       : assert(db != null) {
-    if (db?.schema?.hasTable("state") == null) {
-      String msg = 'The database must have a schema for a "state" table';
-      if (db.schema == null) {
+    if (db?.schema?.hasTable(table) == null) {
+      String msg = 'The database must have a schema for a "$table" table';
+      if (!db.hasSchema) {
         msg += ". The database have no schema";
-      } else if (db.schema.hasTable("state") == null)
+      } else if (db.schema.hasTable(table) == null)
         msg += ". Database schema: \n${db.schema}";
       throw (ArgumentError(msg));
     }
@@ -18,6 +19,7 @@ class PersistentState {
 
   final Db db;
   bool verbose;
+  final String table;
 
   SynchronizedMap _synchronizedMap;
   final Completer _readyCompleter = Completer();
@@ -57,9 +59,10 @@ class PersistentState {
 
   Future<void> init() async {
     assert(db.isReady);
+    assert(db.hasSchema);
     try {
       String columns;
-      for (DatabaseColumn col in db.schema.table("state").schema) {
+      for (DatabaseColumn col in db.schema.table(table).schema) {
         if (columns == null) {
           columns = col.name;
         } else {
@@ -68,7 +71,7 @@ class PersistentState {
       }
       _synchronizedMap = SynchronizedMap(
           db: db,
-          table: "state",
+          table: table,
           columns: columns,
           where: 'id=1',
           verbose: verbose);
@@ -80,6 +83,10 @@ class PersistentState {
       debugPrint("STATE: created persistant state: ${_synchronizedMap.data}");
     _isReady = true;
     _readyCompleter.complete();
+  }
+
+  void dispose() {
+    _synchronizedMap.dispose();
   }
 
   void describe() {

@@ -5,7 +5,10 @@ import 'package:sqlcool/sqlcool.dart';
 
 class PersistentState {
   PersistentState(
-      {@required this.db, this.table = "state", this.verbose = false})
+      {@required this.db,
+      this.table = "state",
+      this.id = 1,
+      this.verbose = false})
       : assert(db != null) {
     if (db?.schema?.hasTable(table) == null) {
       String msg = 'The database must have a schema for a "$table" table';
@@ -20,6 +23,7 @@ class PersistentState {
   final Db db;
   bool verbose;
   final String table;
+  final int id;
 
   SynchronizedMap _synchronizedMap;
   final Completer _readyCompleter = Completer();
@@ -73,7 +77,7 @@ class PersistentState {
           db: db,
           table: table,
           columns: columns,
-          where: 'id=1',
+          where: "id=$id",
           verbose: verbose);
       await _synchronizedMap.onReady;
     } catch (e) {

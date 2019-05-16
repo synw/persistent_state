@@ -1,6 +1,31 @@
 # Persistent state
 
-Persist state in a database across restarts and returns from hibernation. Powered by [Sqlcool](https://github.com/synw/sqlcool)
+Persist state in an Sqlite database across restarts and returns from hibernation. Powered by [Sqlcool](https://github.com/synw/sqlcool)
+
+## Api
+
+### Constructor
+
+**PersistentState**: constructor parameters:
+
+- **db**: an Sqlcool database
+- **table**: the table to be used for the state
+- **verbose**: verbosity level
+
+## Methods
+
+**mutate**: change the value of a key in the persistent state
+
+- **key**: the key to modify
+- **value**: the new value
+
+This method is asynchronous but can not be awaited. The database queries are queued and will be exectuted in order in case of multiple calls to this method.
+
+**select**: get the value of a key
+
+- **key**: the key to get
+
+This method does not hit the database.
 
 ## Example
 

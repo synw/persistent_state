@@ -1,5 +1,7 @@
 # Persistent state
 
+[![pub package](https://img.shields.io/pub/v/persistent_state.svg)](https://pub.dartlang.org/packages/persistent_state)
+
 Persist state in an Sqlite database across restarts and returns from hibernation. Powered by [Sqlcool](https://github.com/synw/sqlcool)
 
 ## Api

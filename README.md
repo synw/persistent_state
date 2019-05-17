@@ -141,3 +141,12 @@ Calling `navigate` from anywhere will persist the state of the current route
    ```dart
    state.navigate(context, "/page3");
    ```
+
+## Examples
+
+Several examples are available:
+
+- **Routes**: a simple example to persist the current route
+- **Squares**: an example showing a high throughput of state updates
+- **Bloc**: an example using the bloc pattern
+- **Scoped model**: an example using scoped model

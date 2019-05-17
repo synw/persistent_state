@@ -1,31 +1,32 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'package:persistent_state/persistent_state.dart';
 import '../db.dart';
 
-var state = RouteState();
+var state = ScopedModelState();
 
-class RouteState {
+class ScopedModelState extends Model {
   PersistentState store;
   Completer _readyCompleter = Completer<dynamic>();
 
-  String get currentRoute => store.select("route");
-  //set currentRoute(String routeName) => store.mutate("route", routeName);
+  int get currentNumber => int.tryParse("${store.select("number")}");
+  set currentNumber(int n) => _setCurrentNumber(n);
 
   Future<dynamic> get onReady => _readyCompleter.future;
 
-  Future<void> navigate(BuildContext context, String routeName) async {
-    print("Navigating to $routeName");
-    store.mutate("route", routeName);
-    await Navigator.of(context).pushNamed(routeName);
+  void _setCurrentNumber(int n) {
+    // hit the database
+    store.mutate("number", "$n");
+    notifyListeners();
   }
 
   Future<void> init() async {
     assert(db.isReady);
     if (_readyCompleter.isCompleted) return;
-    print("Initializing routes state");
+    print("Initializing scoped_model state");
     try {
-      store = PersistentState(db: db, table: "routes_state", verbose: true);
+      store =
+          PersistentState(db: db, table: "scoped_model_state", verbose: true);
       await store.init();
       await store.onReady;
       _readyCompleter.complete();
@@ -38,7 +39,7 @@ class RouteState {
     if (store != null) {
       store.dispose();
       _readyCompleter = Completer<dynamic>();
-      print("Disposed route state");
+      print("Disposed bloc state");
     }
   }
 }

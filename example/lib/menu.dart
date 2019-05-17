@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
-import 'routes/state.dart' as routesState show state;
-import 'squares/state.dart' as squaresState show state;
+import 'db.dart';
+import 'routes/state.dart' as routes show state;
+import 'squares/state.dart' as squares show state;
+import 'bloc/state.dart' as bloc show state;
+import 'scoped_model/state.dart' as scopedModel show state;
 
 class _MenuPageState extends State<MenuPage> {
+  bool ready = false;
+
   @override
   void initState() {
+    db.onReady.then((_) => setState(() => ready = true));
     // dispose the local examples states if needed
-    routesState.state.disposeIfNeeded();
-    squaresState.state.disposeIfNeeded();
+    routes.state.disposeIfNeeded();
+    squares.state.disposeIfNeeded();
+    bloc.state.disposeIfNeeded();
+    scopedModel.state.disposeIfNeeded();
     super.initState();
   }
 
@@ -15,26 +23,45 @@ class _MenuPageState extends State<MenuPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            RaisedButton(
-              child: const Text("Routes"),
-              onPressed: () {
-                routesState.state.init();
-                Navigator.of(context).pushNamed("/intro");
-              },
-            ),
-            const Padding(padding: EdgeInsets.only(bottom: 15.0)),
-            RaisedButton(
-              child: const Text("Squares"),
-              onPressed: () {
-                squaresState.state.init();
-                Navigator.of(context).pushNamed("/squares");
-              },
-            ),
-          ],
-        ),
+        child: ready
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  RaisedButton(
+                    child: const Text("Routes"),
+                    onPressed: () {
+                      routes.state.init();
+                      Navigator.of(context).pushNamed("/intro");
+                    },
+                  ),
+                  const Padding(padding: EdgeInsets.only(bottom: 15.0)),
+                  RaisedButton(
+                    child: const Text("Squares"),
+                    onPressed: () {
+                      squares.state.init();
+                      Navigator.of(context).pushNamed("/squares");
+                    },
+                  ),
+                  const Padding(padding: EdgeInsets.only(bottom: 15.0)),
+                  RaisedButton(
+                    child: const Text("Bloc"),
+                    onPressed: () {
+                      bloc.state.init();
+                      Navigator.of(context).pushNamed("/bloc");
+                    },
+                  ),
+                  const Padding(padding: EdgeInsets.only(bottom: 15.0)),
+                  RaisedButton(
+                    child: const Text("Scoped model"),
+                    onPressed: () {
+                      scopedModel.state.init();
+                      Navigator.of(context).pushNamed("/scoped_model");
+                    },
+                  ),
+                  const Padding(padding: EdgeInsets.only(bottom: 15.0)),
+                ],
+              )
+            : const CircularProgressIndicator(),
       ),
     );
   }

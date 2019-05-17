@@ -4,6 +4,8 @@ import 'menu.dart';
 import 'routes/page_builder.dart';
 import 'routes/intro.dart';
 import 'squares/squares.dart';
+import 'bloc/bloc.dart';
+import 'scoped_model/scoped_model.dart';
 
 final routes = {
   '/': (BuildContext context) => MenuPage(),
@@ -16,6 +18,10 @@ final routes = {
   '/page5': (BuildContext context) => Page(5),
   // squares example
   '/squares': (BuildContext context) => SquaresPage(),
+  // bloc example
+  '/bloc': (BuildContext context) => BlocPage(),
+  // scoped model example
+  '/scoped_model': (BuildContext context) => ScopedModelPage(),
 };
 
 class MyApp extends StatelessWidget {

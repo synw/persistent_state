@@ -1,31 +1,33 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:persistent_state/persistent_state.dart';
 import '../db.dart';
 
-var state = RouteState();
+var state = BlocState();
 
-class RouteState {
+class BlocState {
   PersistentState store;
   Completer _readyCompleter = Completer<dynamic>();
 
-  String get currentRoute => store.select("route");
-  //set currentRoute(String routeName) => store.mutate("route", routeName);
+  final StreamController<int> _controller = StreamController<int>.broadcast();
+
+  Stream<int> get changefeed => _controller.stream;
+
+  int get currentNumber => int.tryParse("${store.select("number")}");
+  set currentNumber(int n) => _setCurrentNumber(n);
 
   Future<dynamic> get onReady => _readyCompleter.future;
 
-  Future<void> navigate(BuildContext context, String routeName) async {
-    print("Navigating to $routeName");
-    store.mutate("route", routeName);
-    await Navigator.of(context).pushNamed(routeName);
+  void _setCurrentNumber(int n) {
+    store.mutate("number", "$n");
+    _controller.sink.add(n);
   }
 
   Future<void> init() async {
     assert(db.isReady);
     if (_readyCompleter.isCompleted) return;
-    print("Initializing routes state");
+    print("Initializing bloc state");
     try {
-      store = PersistentState(db: db, table: "routes_state", verbose: true);
+      store = PersistentState(db: db, table: "bloc_state", verbose: true);
       await store.init();
       await store.onReady;
       _readyCompleter.complete();
@@ -38,7 +40,8 @@ class RouteState {
     if (store != null) {
       store.dispose();
       _readyCompleter = Completer<dynamic>();
-      print("Disposed route state");
+      _controller.close();
+      print("Disposed bloc state");
     }
   }
 }

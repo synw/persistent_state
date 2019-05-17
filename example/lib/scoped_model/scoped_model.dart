@@ -25,19 +25,19 @@ class _ScopedModelPageState extends State<ScopedModelPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       ScopedModelDescendant<ScopedModelState>(
-                        builder: (context, child, model) {
-                          Widget w;
-                          switch (state.currentNumber == null) {
-                            case false:
-                              w = Text("${state.currentNumber}",
+                          builder: (context, child, model) {
+                        Widget w;
+                        switch (state.currentNumber == null) {
+                          case false:
+                            w = Text("${state.currentNumber}",
                                 textScaleFactor: 5.0);
-                              break;
-                            case true:
+                            break;
+                          case true:
                             w = const Text("Select a number",
                                 textScaleFactor: 1.3);
                         }
-                        return w;}
-                      ),
+                        return w;
+                      }),
                       const Padding(padding: EdgeInsets.only(bottom: 20.0)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,

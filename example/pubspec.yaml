@@ -29,6 +29,8 @@ dev_dependencies:
     sdk: flutter
   persistent_state:
     path: ../
+  scoped_model: ^1.0.1
+  #provider: ^2.0.1
 
 
 # For information on the generic Dart part of this file, see the

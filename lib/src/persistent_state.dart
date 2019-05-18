@@ -90,7 +90,7 @@ class PersistentState {
     assert(db.isReady);
     try {
       String columns;
-      for (DatabaseColumn col in db.schema.table(table).schema) {
+      for (DatabaseColumn col in db.schema.table(table).columns) {
         if (columns == null) {
           columns = col.name;
         } else {

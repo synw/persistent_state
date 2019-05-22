@@ -71,12 +71,12 @@ class PersistentState {
   /// Limitation: rhis method is async but can not be awaited.
   /// The queries are queued so this method can
   /// be safely called concurrently
-  void mutate(String key, String value) {
+  void mutate(String key, dynamic value) {
     assert(_isReady);
     try {
       if (!_synchronizedMap.data.containsKey(key))
         throw (ArgumentError("Key $key not found"));
-      _synchronizedMap.data[key] = value;
+      _synchronizedMap.data[key] = "$value";
       if (verbose) debugPrint("STATE: mutated $key to $value");
     } catch (e) {
       throw (e);

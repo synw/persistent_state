@@ -2,6 +2,8 @@
 
 [![pub package](https://img.shields.io/pub/v/persistent_state.svg)](https://pub.dartlang.org/packages/persistent_state)
 
+## DEPRECATED: this module has been deprecated in favor of [Kvsql](https://github.com/synw/kvsql)
+
 Persist state in an Sqlite database across restarts and returns from hibernation. Powered by [Sqlcool](https://github.com/synw/sqlcool)
 
 ## Api

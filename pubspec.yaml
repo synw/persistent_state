@@ -23,7 +23,6 @@ dependencies:
     sdk: flutter
   pedantic: ^1.6.0
   extra_pedantic: ^1.1.1+1
-  provider: ^3.1.0+1
   kvsql:
     path: ../kvsql
 

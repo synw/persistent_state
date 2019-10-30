@@ -11,7 +11,7 @@ final StreamController<Store> stateController = StreamController<Store>();
 void updateState({@required UpdateType type, @required dynamic value}) =>
     stateController.sink.add(Store.update(type, value));
 
-class AppState with PersistentState<Store, UpdateType> {
+class AppState with PersistentState<UpdateType> {
   int get intProp => select<int>("int_prop");
   set intProp(int v) => mutate<int>("int_prop", v, UpdateType.intProp);
 

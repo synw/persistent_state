@@ -1,41 +1,28 @@
 import 'package:flutter/material.dart';
-import 'db.dart';
-import 'menu.dart';
-import 'routes/page_builder.dart';
-import 'routes/intro.dart';
-import 'squares/squares.dart';
-import 'bloc/bloc.dart';
-import 'scoped_model/scoped_model.dart';
+import 'package:provider/provider.dart';
 
-final routes = {
-  '/': (BuildContext context) => MenuPage(),
-  // pages example
-  '/intro': (BuildContext context) => IntroPage(),
-  '/page1': (BuildContext context) => Page(1),
-  '/page2': (BuildContext context) => Page(2),
-  '/page3': (BuildContext context) => Page(3),
-  '/page4': (BuildContext context) => Page(4),
-  '/page5': (BuildContext context) => Page(5),
-  // squares example
-  '/squares': (BuildContext context) => SquaresPage(),
-  // bloc example
-  '/bloc': (BuildContext context) => BlocPage(),
-  // scoped model example
-  '/scoped_model': (BuildContext context) => ScopedModelPage(),
+import 'page.dart';
+import 'state.dart';
+
+final Map<String, Page Function(BuildContext)> routes = {
+  '/': (BuildContext context) => Page(),
 };
+
+void main() {
+  runApp(MyApp());
+  appState = AppState()..init();
+}
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Persistent state demo',
-      routes: routes,
-    );
+    return StreamProvider<Store>.value(
+        initialData: Store(),
+        value: stateController.stream,
+        child: MaterialApp(
+          routes: routes,
+          debugShowCheckedModeBanner: false,
+          title: 'Persistent state example',
+        ));
   }
-}
-
-void main() {
-  initDb();
-  runApp(MyApp());
 }

@@ -4,7 +4,7 @@ import 'package:kvsql/kvsql.dart';
 import 'models.dart';
 
 /// The base state class
-class PersistentState<StoreType, UpdateType> {
+class PersistentState<UpdateType> {
   /// Use this if [kvStore] is not overriden
   Future<void> init({bool verbose = false}) async {
     if (kvStore == null) {

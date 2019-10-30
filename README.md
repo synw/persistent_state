@@ -2,153 +2,69 @@
 
 [![pub package](https://img.shields.io/pub/v/persistent_state.svg)](https://pub.dartlang.org/packages/persistent_state)
 
-## DEPRECATED: this module has been deprecated in favor of [Kvsql](https://github.com/synw/kvsql)
+Persist state in an Sqlite database across restarts and returns from hibernation
 
-Persist state in an Sqlite database across restarts and returns from hibernation. Powered by [Sqlcool](https://github.com/synw/sqlcool)
+Powered by the [KvSql](https://github.com/synw/kvsql) key/value store. The state is saved to an Sqlite database
 
-## Api
+## Usage
 
-### Constructor
-
-**`PersistentState`**: constructor parameters:
-
-- `db`: an Sqlcool database: see the [documentation](https://sqlcool.readthedocs.io/en/latest/init.html)
-- `table`: the table to be used for the state. Defailt "state".
-- `id`: id of the table row to use. Default 1.
-- `verbose`: verbosity level
-
-### Methods
-
-**`init`**: initialize the state. Run before using it.
-
-**`onReady`**: a future that will complete when the state is initialized
-
-**`mutate`**: change the value of a key in the persistent state
-
-- `key`: the key to modify
-- `value`: the new value
-
-This method is asynchronous but can not be awaited. The database queries are queued and will be exectuted in order in case of multiple calls to this method.
-
-**`select`**: get the value of a key
-
-- `key`: the key to get
-
-This method does not hit the database.
-
-**`dispose`**: dispose the state once finished using to clean up memory
-
-**`describe`**: prints a description of the state
-
-## Example
-
-Goal: to persist the current page
-
-### Define the state data and initialize the database
-
- In `db.dart`:
-
-   ```dart
-   import 'package:sqlcool/sqlcool.dart';
-
-   Db db = Db();
-
-   DbTable stateTableSchema() {
-     /// Define a state table in the database
-     ///
-     /// Documentation about schemas:
-     /// https://pub.dev/documentation/sqlcool/latest/sqlcool/DbTable-class.html
-     ///
-     return DbTable("state")..varchar("route", defaultValue: '"/page1"');
-   }
-
-   Future<void> initDb() async {
-      try {
-         await db.init(
-            path: "db.sqlite",
-            schema: [stateTableSchema()],
-            queries: [_populate()]);
-         } catch (e) {
-      throw ("Can not init db $e");
-      }
-   }
-
-   String _populate() {
-      return 'INSERT INTO state(id) VALUES(1)';
-   }
-   ```
-
-### Create the state
-
-In `state.dart`:
+Create your state class:
 
    ```dart
    import 'dart:async';
-   import 'package:flutter/material.dart';
+   import 'package:flutter/foundation.dart';
    import 'package:persistent_state/persistent_state.dart';
-   import 'db.dart';
 
-   AppState state = AppState();
 
-   class AppState {
-      PersistentState store;
+   enum UpdateType { intProp, stringProp, doubleProp, listProp, mapProp }
 
-      Completer _readyCompleter = Completer();
+   class AppState with PersistentState<UpdateType> {
 
-      String get currentRoute => store.select("route");
+     double get doubleProp => select<double>("double_prop");
+     set doubleProp(double v) =>
+         mutate<double>("double_prop", v, UpdateType.doubleProp);
 
-      Future<dynamic> get onReady => _readyCompleter.future;
+     List<int> get listProp => select<List<int>>("list_prop");
+     set listProp(List<int> v) =>
+         mutate<List<int>>("list_prop", v, UpdateType.listProp);
 
-      Future<void> navigate(BuildContext context, String routeName) async {
-         // Hit the database to update the route
-         store.mutate("route", routeName);
-         await Navigator.of(context).pushNamed(routeName);
-      }
-
-      Future<void> init() async {
-         /// db is an Sqlcool [Db] object
-         /// run [initDb] before this
-         assert(db.isReady);
-         try {
-            store = PersistentState(db: db);
-            store.init();
-            await store.onReady;
-            _readyCompleter.complete();
-         } catch (e) {
-            throw ("Can not create persistent state $e");
-         }
-      }
+     Map<String, int> get mapProp => select<Map<String, int>>("map_prop");
+     set mapProp(Map<String, int> v) =>
+         mutate<Map<String, int>>("map_prop", v, UpdateType.mapProp);
    }
    ```
 
-### Init state
+All the mutations will be persisted to the database:
 
    ```dart
-   void main() {
-      initDb().then((_) => state.init());
-      runApp(MyApp());
+   state.doubleProp = 3.0;
+   ```
+
+**Note**: the state reads with `select` do not hit the database and
+use an in memory copy of the state
+
+If you already use KvSql you can provide your own store:
+
+   ```dart
+
+   final store = KvStore(inMemory: true);
+
+   class AppState with PersistentState<UpdateType> {
+      @override
+      KvStore kvStore => store;
    }
-
-   // later
-   await state.onReady;
-   // or
-   state.onReady.then((_) => doSomething());
    ```
 
+### Listen to state changes
 
-### Use the state
-
-Calling `navigate` from anywhere will persist the state of the current route
+A changefeed is available:
 
    ```dart
-   state.navigate(context, "/page3");
+   /// [appState] is an [AppState] instance
+   appState.changeFeed.listen((StateUpdate change) =>
+      print("State update: \n${change.type}");
    ```
 
-## Examples
+## Example
 
-Several examples are available:
-
-- **Routes**: a simple example to persist the current route
-- **Squares**: an example showing a high throughput of state updates
-- **Bloc**: an example using the bloc pattern
-- **Scoped model**: an example using scoped model
+An [example](example) with Provider is available

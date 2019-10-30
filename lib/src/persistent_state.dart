@@ -1,6 +1,8 @@
 import 'dart:async';
-import 'package:sqlcool/sqlcool.dart';
+
 import 'package:kvsql/kvsql.dart';
+
+import 'exceptions.dart';
 import 'models.dart';
 
 /// The base state class
@@ -11,7 +13,7 @@ class PersistentState<UpdateType> {
       kvStore = KvStore(inMemory: true, verbose: verbose);
     } else {
       assert(kvStore.inMemory);
-      assert(kvStore.isReady);
+      //assert(kvStore.isReady);
     }
   }
 
@@ -27,7 +29,7 @@ class PersistentState<UpdateType> {
   Future<void> get onReady => kvStore.onReady;
 
   /// Use this when no [kvStore] is provided at initialization
-  bool get isReady => kvStore.isReady;
+  //bool get isReady => kvStore.isReady;
 
   /// The feed of state changes
   Stream<StateUpdate> get changeFeed => _changeFeed.stream;
@@ -38,7 +40,7 @@ class PersistentState<UpdateType> {
     try {
       v = kvStore.selectSync<T>(key);
     } catch (e) {
-      throw ReadQueryException("Can not read state: database error: $e");
+      throw StateStorageException("Can not read state: database error: $e");
     }
     return v;
   }
@@ -52,7 +54,7 @@ class PersistentState<UpdateType> {
     try {
       await kvStore.put<T>(key, v);
     } catch (e) {
-      throw WriteQueryException(
+      throw StateStorageException(
           "Can not mutate state: database write error: $e");
     }
     final update = StateUpdate<UpdateType>(key, value, type);

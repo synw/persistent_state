@@ -1,128 +1,68 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
-//import 'package:observable/observable.dart';
 import 'package:sqlcool/sqlcool.dart';
+import 'package:kvsql/kvsql.dart';
+import 'models.dart';
 
-/// A class to persist some state to a database
-class PersistentState {
-  /// Default constructor: provide at least a [Db] an make sure
-  /// that your database has a schema for the state table
-  PersistentState(
-      {@required this.db,
-      this.table = "state",
-      this.id = 1,
-      this.verbose = false})
-      : assert(db != null) {
-    if (db?.schema?.hasTable(table) == null) {
-      String msg = 'The database must have a schema for a "$table" table';
-      if (!db.hasSchema) {
-        msg += ". The database have no schema";
-      } else if (db.schema.hasTable(table) == null)
-        msg += ". Database schema: \n${db.schema}";
-      throw (ArgumentError(msg));
+/// The base state class
+class PersistentState<StoreType, UpdateType> {
+  /// Use this if [kvStore] is not overriden
+  Future<void> init({bool verbose = false}) async {
+    if (kvStore == null) {
+      kvStore = KvStore(inMemory: true, verbose: verbose);
+    } else {
+      assert(kvStore.inMemory);
+      assert(kvStore.isReady);
     }
   }
 
-  /// This Sqlcool [Db]
-  final Db db;
-
-  /// Verbosity level
-  bool verbose;
-
-  /// The database table to use for this instance of state
-  final String table;
-
-  /// The row id to use for this instance of state
-  final int id;
-
-  SynchronizedMap _synchronizedMap;
-  final Completer _readyCompleter = Completer<dynamic>();
-  bool _isReady = false;
-
-  //ObservableMap<String, String> get data => _synchronizedMap.data;
-
-  /// A future that completes when the state is ready
-  Future<dynamic> get onReady => _readyCompleter.future;
-
-  /// Check if the state is ready
-  bool get isReady => _isReady;
-
-  /// Select a key to get it's value.
+  /// The class to kvStore the data
   ///
-  /// This does not hit the database
-  String select(String key) {
-    assert(_isReady);
-    String res;
+  /// Override this to provide your own store
+  KvStore kvStore;
+
+  final StreamController<StateUpdate> _changeFeed =
+      StreamController<StateUpdate>.broadcast();
+
+  /// Use this when no [kvStore] is provided at initialization
+  Future<void> get onReady => kvStore.onReady;
+
+  /// Use this when no [kvStore] is provided at initialization
+  bool get isReady => kvStore.isReady;
+
+  /// The feed of state changes
+  Stream<StateUpdate> get changeFeed => _changeFeed.stream;
+
+  /// Get a value for a key
+  T select<T>(String key) {
+    T v;
     try {
-      if (!_synchronizedMap.data.containsKey(key))
-        throw (ArgumentError("Key $key not found"));
-      res = _synchronizedMap.data[key];
-      if (res == "null") return null;
-      //if (verbose) debugPrint("STATE: selected $key : $res");
+      v = kvStore.selectSync<T>(key);
     } catch (e) {
-      throw (e);
+      throw ReadQueryException("Can not read state: database error: $e");
     }
-    return res;
+    return v;
   }
 
-  /// Change the value of a key
-  ///
-  /// This hits the database with an update query.
-  /// Limitation: rhis method is async but can not be awaited.
-  /// The queries are queued so this method can
-  /// be safely called concurrently
-  void mutate(String key, dynamic value) {
-    assert(_isReady);
+  /// Mutate a property
+  Future<void> mutate<T>(String key, dynamic value, [UpdateType type]) async {
+    T v;
     try {
-      if (!_synchronizedMap.data.containsKey(key))
-        throw (ArgumentError("Key $key not found"));
-      _synchronizedMap.data[key] = "$value";
-      if (verbose) debugPrint("STATE: mutated $key to $value");
-    } catch (e) {
-      throw (e);
-    }
-  }
-
-  /// Initialize the state
-  ///
-  /// Make sure that the [Db] is ready before running this.
-  Future<void> init() async {
-    assert(db.isReady);
+      v = value as T;
+    } catch (e) {}
     try {
-      String columns;
-      for (DatabaseColumn col in db.schema.table(table).columns) {
-        if (columns == null) {
-          columns = col.name;
-        } else {
-          columns = "$columns,${col.name}";
-        }
-      }
-      _synchronizedMap = SynchronizedMap(
-          db: db,
-          table: table,
-          columns: columns,
-          where: "id=$id",
-          verbose: verbose);
-      await _synchronizedMap.onReady;
+      await kvStore.put<T>(key, v);
     } catch (e) {
-      throw (e);
+      throw WriteQueryException(
+          "Can not mutate state: database write error: $e");
     }
-    if (verbose)
-      debugPrint("STATE: created persistant state: ${_synchronizedMap.data}");
-    _isReady = true;
-    _readyCompleter.complete();
+    final update = StateUpdate<UpdateType>(key, value, type);
+    _notify(update);
   }
 
-  /// Dispose the state to free up memory
-  void dispose() {
-    _synchronizedMap.dispose();
+  void _notify(StateUpdate update) {
+    _changeFeed.sink.add(update);
   }
 
-  /// Print a description of the current state
-  void describe() {
-    debugPrint("PERSISTANT STATE:");
-    _synchronizedMap.data.forEach((k, v) {
-      debugPrint("  - $k : $v");
-    });
-  }
+  /// Dispose when finished using
+  void dispose() => _changeFeed.close();
 }

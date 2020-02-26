@@ -8,7 +8,7 @@ Persist state in an Hive database across restarts and returns from hibernation
 
 ### Create state update types
 
-In *store.dart* define the state mutations:
+Define the state mutations:
 
    ```dart
    enum UpdateType { intProp, stringProp, doubleProp, listProp, mapProp }
@@ -16,7 +16,7 @@ In *store.dart* define the state mutations:
 
 ### Create the state class
 
-In *state.dart*  create your state class and map the properties to the persitent store:
+Create your state class and map the properties to the persitent store:
 
    ```dart
    import 'package:persistent_state/persistent_state.dart';

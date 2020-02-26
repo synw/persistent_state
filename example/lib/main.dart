@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:pedantic/pedantic.dart';
 
 import 'page.dart';
 import 'state.dart';
@@ -10,7 +11,8 @@ final Map<String, Page Function(BuildContext)> routes = {
 
 void main() {
   runApp(MyApp());
-  appState = AppState()..init();
+  appState = AppState();
+  unawaited(appState.init());
 }
 
 class MyApp extends StatelessWidget {

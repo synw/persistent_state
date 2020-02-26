@@ -14,7 +14,9 @@ In *store.dart* define state the mutations:
    enum UpdateType { intProp, stringProp, doubleProp, listProp, mapProp }
    ```
 
-In *state.dart*  create your state class and map the properties to the persitant store:
+### Create the state class
+
+In *state.dart*  create your state class and map the properties to the persitent store:
 
    ```dart
    import 'package:persistent_state/persistent_state.dart';

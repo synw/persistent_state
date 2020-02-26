@@ -1,5 +1,4 @@
 name: persistent_state
-author: synw <ansterj@gmail.com>
 description: Persist state in a Sqlite database across restarts and returns from hibernation
 homepage: https://github.com/synw/persistent_state
 version: 0.3.0

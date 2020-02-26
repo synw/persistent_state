@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:persistent_state/persistent_state.dart';
 import 'package:provider/provider.dart';
 
-import 'state.dart';
 import 'store.dart';
 
 Random random = Random();

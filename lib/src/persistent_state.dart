@@ -9,10 +9,10 @@ import 'models.dart';
 
 /// The base state class
 class PersistentState<UpdateType> {
-  /// Use this if [Box] is not overriden
-  Future<void> init({bool verbose = false}) async {
+  /// Initialize the store
+  Future<void> init() async {
     await Hive.initFlutter();
-    box ??= await Hive.openBox<dynamic>('state');
+    box = await Hive.openBox<dynamic>('state');
     _onReady.complete();
   }
 

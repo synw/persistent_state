@@ -5,4 +5,7 @@ class StateStorageException implements Exception {
 
   /// The error message
   final String message;
+
+  @override
+  String toString() => message;
 }

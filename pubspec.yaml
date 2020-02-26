@@ -10,9 +10,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  pedantic: ^1.6.0
+  pedantic: ^1.8.0
   extra_pedantic: ^1.1.1+1
-  kvsql: ^0.2.1
+  hive: ^1.4.1+1
+  hive_flutter: ^0.3.0+2
+  err: ^0.9.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

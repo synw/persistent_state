@@ -1,35 +1,32 @@
 import 'dart:async';
 
-import 'package:kvsql/kvsql.dart';
+import 'package:err/err.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import 'exceptions.dart';
 import 'models.dart';
 
 /// The base state class
 class PersistentState<UpdateType> {
-  /// Use this if [kvStore] is not overriden
+  /// Use this if [Box] is not overriden
   Future<void> init({bool verbose = false}) async {
-    if (kvStore == null) {
-      kvStore = KvStore(inMemory: true, verbose: verbose);
-    } else {
-      assert(kvStore.inMemory);
-      //assert(kvStore.isReady);
-    }
+    await Hive.initFlutter();
+    box ??= await Hive.openBox<dynamic>('state');
+    _onReady.complete();
   }
 
-  /// The class to kvStore the data
+  /// The class to store the data
   ///
   /// Override this to provide your own store
-  KvStore kvStore;
+  Box<dynamic> box;
 
   final StreamController<StateUpdate> _changeFeed =
       StreamController<StateUpdate>.broadcast();
+  final _onReady = Completer<dynamic>();
 
   /// Use this when no [kvStore] is provided at initialization
-  Future<void> get onReady => kvStore.onReady;
-
-  /// Use this when no [kvStore] is provided at initialization
-  //bool get isReady => kvStore.isReady;
+  Future<void> get onReady => _onReady.future;
 
   /// The feed of state changes
   Stream<StateUpdate> get changeFeed => _changeFeed.stream;
@@ -38,7 +35,7 @@ class PersistentState<UpdateType> {
   T select<T>(String key) {
     T v;
     try {
-      v = kvStore.selectSync<T>(key);
+      v = box.get(key) as T;
     } catch (e) {
       throw StateStorageException("Can not read state: database error: $e");
     }
@@ -50,9 +47,12 @@ class PersistentState<UpdateType> {
     T v;
     try {
       v = value as T;
-    } catch (e) {}
+    } catch (e) {
+      Err.error("The provided value $v is not $T").raise();
+      return;
+    }
     try {
-      await kvStore.put<T>(key, v);
+      await box.put(key, v);
     } catch (e) {
       throw StateStorageException(
           "Can not mutate state: database write error: $e");

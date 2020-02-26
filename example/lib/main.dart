@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:pedantic/pedantic.dart';
+import 'package:provider/provider.dart';
 
 import 'page.dart';
 import 'state.dart';
+import 'store.dart';
 
 final Map<String, Page Function(BuildContext)> routes = {
   '/': (BuildContext context) => Page(),

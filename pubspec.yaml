@@ -2,7 +2,7 @@ name: persistent_state
 author: synw <ansterj@gmail.com>
 description: Persist state in a Sqlite database across restarts and returns from hibernation
 homepage: https://github.com/synw/persistent_state
-version: 0.2.0
+version: 0.3.0
 
 environment:
   sdk: ">=2.3.0 <3.0.0"

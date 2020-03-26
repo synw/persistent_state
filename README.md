@@ -46,14 +46,14 @@ Create your state class and map the properties to the persitent store:
    }   
    ```
 
-### Initialize
+### Initialize
 
    ```dart
    final AppState state = AppState();
    await state.init();
    ```
-
-### Mutate
+   
+### Mutate
 
 All the mutations will be persisted to the database:
 

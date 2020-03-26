@@ -46,6 +46,9 @@ Create your state class and map the properties to the persitent store:
    }   
    ```
 
+**Note**: the state reads with `select` do not hit the database and
+use an in memory copy of the state
+
 ### Initialize
 
    ```dart
@@ -60,9 +63,6 @@ All the mutations will be persisted to the database:
    ```dart
    state.doubleProp = 3.0;
    ```
-
-**Note**: the state reads with `select` do not hit the database and
-use an in memory copy of the state
 
 ### Listen to state changes
 
